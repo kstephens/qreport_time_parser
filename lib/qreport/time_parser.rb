@@ -9,9 +9,10 @@ module Qreport
       end
     end
 
-    attr_accessor :input, :result, :now, :debug
+    attr_accessor :input, :start, :result, :now, :debug
 
-    def initialize
+    def initialize start = nil
+      @start = start
       @input = ''
       @unit_for_now = { :today => :day, :t => nil }
       @debug = false # true
@@ -21,6 +22,7 @@ module Qreport
     end
 
     def parse str, start = nil
+      start ||= @start
       @input_orig = str.dup
       @input = str.dup
       @pos = 0
