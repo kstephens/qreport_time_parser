@@ -16,6 +16,12 @@ describe Qreport::TimeParser do
     it "should handle -" do
       (c - a).inspect.should == "#<Qreport::TimeParser::TimeInterval 3600.0 nil>"
     end
+    it "should #inspect." do
+      a.inspect.should == "#<Qreport::TimeParser::TimeWithUnit :min 2013-01-23T00:34:00.000000-06:00>"
+    end
+    it "should convert to Range of Time." do
+      a.to_range.should == (a.to_time ... (a.to_time + 60))
+    end
   end
 
   describe Qreport::TimeParser::TimeInterval do
