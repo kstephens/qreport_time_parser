@@ -13,7 +13,7 @@ module Qreport
 
     def initialize start = nil
       @start = start
-      @unit_for_now = { :today => :day, :t => nil }
+      @unit_for_now = { :today => :day, :t => :now }
       @debug = false # true
       initialize_copy nil
     end
@@ -319,7 +319,7 @@ module Qreport
       when /\A(today|now|t)\b/i
         case unit = get_unit_for_now($1)
         when :now
-          value = now
+          value = TimeWithUnit.new(now, nil)
         else
           value = TimeWithUnit.new(now, unit)
         end
@@ -718,10 +718,9 @@ module Qreport
         x = interval(x) if Numeric === x
         case x
         when TimeInterval
-          new(@time - x.to_sec,
-              [ unit_interval, x.unit_interval ])
+          new(@time - x.to_sec, unit_interval)
         when TimeWithUnit, ::Time
-          interval(@time.to_f - x.to_f, :sec)
+          interval(@time.to_f - x.to_f, unit_interval)
         else
           raise TypeError, x.inspect
         end
@@ -915,7 +914,7 @@ module Qreport
         "2011-03-10T15:10:37-06:00 plus 10 sec" => ":sec 2011-03-10T15:10:47.000000-06:00",
         "2011-03-10T15:10:37.981304-06:00 - 2 weeks" => "nil 2011-02-24T15:10:37.981304-06:00",
         "now minus 2.5 weeks" => "nil 2011-03-10T15:10:35.481304-06:00",
-        "t - 10 sec" => ":sec 2011-03-10T15:10:27.000000-06:00",
+        "t - 10 sec" => "nil 2011-03-10T15:10:27.981304-06:00",
         "123.45 sec ago" => "nil 2011-03-10T15:08:34.531303-06:00",
         "year 2010" => ":year 2010-01-01T00:00:00.000000-06:00",
         "between 12:45pm and 1:15pm" => ":min 2011-03-10T12:45:00.000000-06:00 ... :min 2011-03-10T13:15:00.000000-06:00",
