@@ -385,6 +385,10 @@ module Qreport
     }
 
     def now
+      case @now
+      when Proc
+        @now = @now.call
+      end
       @now ||= Time.now
     end
 
