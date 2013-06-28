@@ -1,7 +1,7 @@
 require 'time'
 require 'rational'
 
-module Quebee
+module Qreport
   class TimeParser
     class Error < ::Exception; end
 
