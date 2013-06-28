@@ -18,6 +18,7 @@ module Qreport
 
     def parse str
       @input = str.dup
+      @pos = 0
       @result = p_start
       @result = @result.value if @result.respond_to?(:value)
       @result
@@ -237,7 +238,9 @@ module Qreport
     def lex
       debug = @debug
       type = value = nil
-      @input.sub!(/\A\s+/, '')
+      @input.sub!(/\A(\s+)/, '')
+      pre_whitespace = $1
+      @pos += pre_whitespace.size if pre_whitespace
       # $stderr.puts "  @input = #{@input.inspect[0, 20]}..."; debugger
       case @input
       when ''
@@ -335,8 +338,12 @@ module Qreport
         raise Error, "syntax error at #{@input.inspect[0, 10]}..."
       end
       token = $1
+      pos = @pos
       @input[0, token.size] = ''
+      @pos += token.size
       token.extend(Token)
+      token.pos = pos
+      token.pre = pre_whitespace
       token.value = value
       token.type = type
       $stderr.puts "  token => #{token.inspect}" if debug
@@ -368,9 +375,13 @@ module Qreport
     end
 
     module Token
-      attr_accessor :value, :type
+      attr_accessor :value, :type, :pre, :pos
       def inspect
-        "#<Token #{@type.inspect} #{super} #{@value.inspect}>"
+        "#<Token #{@type.inspect} #{super} #{@pos} #{@value.inspect}>"
+      end
+
+      def with_pre
+        @pre.to_s + self
       end
     end
 
