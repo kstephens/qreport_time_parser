@@ -2,8 +2,9 @@ require 'spec_helper'
 require 'qreport/report_runner/time_parse'
 
 describe Qreport::ReportRunner::TimeParse do
+  attr :p
   before(:all) do
-    p = Qreport::TimeParser.new
+    @p = Qreport::TimeParser.new
     p.now = ::Time.parse("2011-04-27T08:23:37.981304")
     Qreport::ReportRunner.time_parser = p
   end
@@ -20,6 +21,10 @@ describe Qreport::ReportRunner::TimeParse do
     end
     it "should parse 'now'." do
       subject.time_parse("now").should == (::Time.parse("2011-04-27T08:23:37.981304") ... ::Time.parse("2011-04-27T08:23:38.981304")) # questionable?
+    end
+    it "should parse 'now' with unit_for_now[:now] = :now." do
+      p.unit_for_now[:now] = :now
+      subject.time_parse("now").should == ::Time.parse("2011-04-27T08:23:37.981304")
     end
     it "should parse relative date." do
       subject.time_parse("yesterday").should == (::Time.parse("2011-04-26T00:00:00") ... ::Time.parse("2011-04-27T00:00:00"))

@@ -9,7 +9,7 @@ module Qreport
       end
     end
 
-    attr_accessor :input, :start, :result, :now, :debug
+    attr_accessor :input, :start, :result, :now, :debug, :unit_for_now
 
     def initialize start = nil
       @start = start
@@ -317,7 +317,12 @@ module Qreport
         value = @@operation_alias[value] || value
         type = :operation
       when /\A(today|now|t)\b/i
-        value = TimeWithUnit.new(now, unit_for_now($1))
+        case unit = get_unit_for_now($1)
+        when :now
+          value = now
+        else
+          value = TimeWithUnit.new(now, unit)
+        end
       when /\A(yesterday)\b/i
         value = TimeWithUnit.new(now, :day) - 1
       when /\A(tomorrow)\b/i
@@ -392,9 +397,9 @@ module Qreport
       @now ||= Time.now
     end
 
-    def unit_for_now name
+    def get_unit_for_now name
       name = name.to_sym
-      @unit_for_now[name]
+      @unit_for_now[name] || @unit_for_now[nil]
     end
 
     module Token
