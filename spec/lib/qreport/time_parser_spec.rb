@@ -16,7 +16,7 @@ describe Qreport::TimeParser do
           # tp.debug = true if expr =~ /between/i
           t = tp.parse(expr)
         rescue Qreport::TimeParser::Error => exc
-          t = exc
+          t = exc.inspect
         end
         t.to_s.should == val
         t.to_TimeRange.to_s.should == time_range.to_s if time_range

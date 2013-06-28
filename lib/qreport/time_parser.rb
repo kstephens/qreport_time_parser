@@ -3,7 +3,11 @@ require 'rational'
 
 module Qreport
   class TimeParser
-    class Error < ::Exception; end
+    class Error < ::Exception
+      class Syntax < self
+        attr_accessor :position, :description
+      end
+    end
 
     attr_accessor :input, :result, :now, :debug
 
@@ -17,6 +21,7 @@ module Qreport
     end
 
     def parse str
+      @input_orig = str.dup
       @input = str.dup
       @pos = 0
       @result = p_start
@@ -335,7 +340,11 @@ module Qreport
         value = $1.downcase.to_sym
         type = :logical
       else
-        raise Error, "syntax error at #{@input.inspect[0, 10]}..."
+        desc = describe_current_parse_position
+        err = Error::Syntax.new("syntax error at position #{@pos}: #{desc.inspect}")
+        err.position = @pos
+        err.description = desc
+        raise err
       end
       token = $1
       pos = @pos
@@ -348,6 +357,12 @@ module Qreport
       token.type = type
       $stderr.puts "  token => #{token.inspect}" if debug
       token
+    end
+
+    def describe_current_parse_position
+      s = @input_orig.dup
+      s[@pos, 0] = " |^| "
+      s
     end
 
     @@operation_alias = {
@@ -841,7 +856,7 @@ module Qreport
         "2001/01" => ":mon 2001-01-01T00:00:00.000000-06:00",
         "2001-01" => ":mon 2001-01-01T00:00:00.000000-06:00",
         # "01/2001" => ":mon 2001-01-01T00:00:00.000000-06:00",
-        "01/2001" => "syntax error at \"/2001\"...",
+        "01/2001" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 2: \"01 |^| /2001\">",
         "2001/02/03 12:23pm" => ":min 2001-02-03T12:23:00.000000-06:00",
         "12/31 12:59pm" => ":min 2011-12-31T12:59:00.000000-06:00",
         "12/31 last year" => ":day 2010-12-31T00:00:00.000000-06:00",
@@ -860,6 +875,7 @@ module Qreport
         "this minute" => ":min 2011-03-10T15:10:00.000000-06:00",
         "last hour" => ":hour 2011-03-10T14:00:00.000000-06:00",
         "last day" => [ ":day 2011-03-09T00:00:00.000000-06:00", ":day 2011-03-09T00:00:00.000000-06:00 ... :day 2011-03-10T00:00:00.000000-06:00" ],
+        "  2001-01 + 1234 ajsdkfsd hours" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 17: \"  2001-01 + 1234  |^| ajsdkfsd hours\">"
       }
       examples[:now] = now
       examples
