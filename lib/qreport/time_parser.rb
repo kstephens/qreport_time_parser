@@ -227,10 +227,10 @@ module Qreport
     def push_token! token
       if @token
         @token_stack.unshift @token 
-        $stderr.puts "push_token! #{@token.inspect}"
+        $stderr.puts "push_token! #{@token.inspect}" if @debug
       end
       @token = token
-      $stderr.puts "push_token! #{@token.inspect}"
+      $stderr.puts "push_token! #{@token.inspect}" if @debug
       self
     end
 
