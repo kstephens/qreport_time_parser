@@ -890,7 +890,9 @@ module Qreport
         "previous hour" => ":hour 2011-03-10T14:00:00.000000-06:00",
         "last day"   => [ ":day 2011-03-09T00:00:00.000000-06:00", ":day 2011-03-09T00:00:00.000000-06:00 ... :day 2011-03-10T00:00:00.000000-06:00" ],
         "previous day" => ":day 2011-03-09T00:00:00.000000-06:00",
-        "  2001-01 + 1234 ajsdkfsd hours" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 17: \"  2001-01 + 1234  |^| ajsdkfsd hours\">"
+        "  2001-01 + 1234 ajsdkfsd hours" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 17: \"  2001-01 + 1234  |^| ajsdkfsd hours\">",
+        "15 sec" => "#<Qreport::TimeParser::Error: Qreport::TimeParser::Error>",
+        "12 minutes" => "#<Qreport::TimeParser::Error: Qreport::TimeParser::Error>",
       }
       examples[:now] = now
       examples
