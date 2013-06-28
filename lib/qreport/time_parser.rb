@@ -13,9 +13,13 @@ module Qreport
 
     def initialize start = nil
       @start = start
-      @input = ''
       @unit_for_now = { :today => :day, :t => nil }
       @debug = false # true
+      initialize_copy nil
+    end
+
+    def initialize_copy x
+      @input = ''
       @token = nil
       @token_stack = [ ]
       @taken_tokens = [ ]
