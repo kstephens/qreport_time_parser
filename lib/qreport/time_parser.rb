@@ -812,7 +812,7 @@ module Qreport
       end
 
       def inspect
-        "#<{self.class] #{to_s}>"
+        "#<#{self.class} #{to_s}>"
       end
 
       def min
