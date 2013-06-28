@@ -505,7 +505,7 @@ module Qreport
         when Numeric
           new(@amount + x, @unit)
         when TimeInterval
-          new(@amount.to_sec + x.to_sec, :second)
+          new(@amount + x.to_sec, :sec)
         else
           raise TypeError, x.class.to_s
         end
@@ -516,7 +516,7 @@ module Qreport
         when Numeric
           new(@amount - x, @unit)
         when TimeInterval
-          new(@amount.to_sec - x.to_sec, :second)
+          new(@amount - x.to_sec, :sec)
         else
           raise TypeError, x.class.to_s
         end
