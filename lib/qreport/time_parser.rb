@@ -45,8 +45,8 @@ module Qreport
     end
 
     def _p_between
-      token.type == :range &&
-        token.value == :between &&
+      token.type == :range and
+        token.value == :between and
         take_token.value
     end
 
@@ -64,14 +64,13 @@ module Qreport
         v
       when v = p_time_or_date_relative
         v
-      when (r = p_relation) && (v = p_time_expr)
+      when (r = p_relation and v = p_time_expr)
         v += r
       else
         return nil
       end
 
-      if (op = p_operation) &&
-          (interval = p_interval)
+      if op = p_operation and interval = p_interval
         case op
         when :+
           v += interval
@@ -89,15 +88,15 @@ module Qreport
     # 10 sec ago
     def _p_numeric_relative
       if (interval = p_interval)
-        case 
-        when (direction = p_relation) && (time = p_time_expr)
+        case
+        when (direction = p_relation and time = p_time_expr)
           time + (interval * direction)
         when (direction = p_relative)
           TimeWithUnit.new(now, interval) + (interval * direction)
         end
       end
     end
-    
+
     # 10 secs|day
     def _p_interval
       case token.value
@@ -115,25 +114,21 @@ module Qreport
 
     # before|after|since
     def _p_relation
-      token.type == :relation && 
-        take_token.value
+      token.type == :relation and take_token.value
     end
 
     # ago
     def _p_relative
-      token.type == :relative && 
-        take_token.value
+      token.type == :relative and take_token.value
     end
 
     # + interval
     def _p_operation
-      token.type == :operation && 
-        take_token.value
+      token.type == :operation and take_token.value
     end
 
     def _p_time
-      TimeWithUnit === token.value && 
-        take_token.value
+      TimeWithUnit === token.value and take_token.value
     end
 
     def _p_time_or_date_relative
@@ -163,16 +158,16 @@ module Qreport
 
     # 12pm|12:30a|12:34:56pm
     def _p_time_relative
-      if token.type == :time_relative && TimeRelative === token.value
-        tr = take_token.value
-      end
+      token.type == :time_relative and
+        TimeRelative === token.value and
+        take_token.value
     end
 
     # 2001/01|2001-02-20
     def _p_date_relative
-      if token.type == :date_relative && TimeRelative === token.value
-        tr = take_token.value
-      end
+      token.type == :date_relative and
+        TimeRelative === token.value and
+        take_token.value
     end
 
     def restore_tokens_on_failure!(sel)
