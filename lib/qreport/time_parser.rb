@@ -663,28 +663,26 @@ module Qreport
         normalize!
       end
 
+      def interval(amount, unit = nil)
+        TimeInterval.new(amount, unit || @unit)
+      end
+
       def + amount
         # debugger
-        case amount
-        when Numeric
-          amount = TimeInterval.new(amount, @unit)
-        end
+        amount = interval(amount) if Numeric === amount
         raise TypeError, amount.to_s unless TimeInterval === amount
         new(@time + amount.to_sec, 
             [ unit_interval, amount.unit_interval ] )
       end
 
       def - x
-        case x
-        when Numeric
-          x = TimeInterval.new(x, @unit)
-        end
+        x = interval(x) if Numeric === x
         case x
         when TimeInterval
           new(@time - x.to_sec,
               [ unit_interval, x.unit_interval ])
         when TimeWithUnit, ::Time
-          TimeInterval.new(@time.to_f - x.to_f, :second)
+          interval(@time.to_f - x.to_f, :sec)
         else
           raise TypeError, x.inspect
         end
