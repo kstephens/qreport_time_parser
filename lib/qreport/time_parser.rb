@@ -500,7 +500,7 @@ module Qreport
         self
       end
 
-      def + amount
+      def + x
         case x
         when Numeric
           new(@amount + x, @unit)
@@ -511,7 +511,7 @@ module Qreport
         end
       end
 
-      def - amount
+      def - x
         case x
         when Numeric
           new(@amount - x, @unit)
