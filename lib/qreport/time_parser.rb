@@ -327,11 +327,12 @@ module Qreport
         value = TimeWithUnit.new(now, $3) + TimeInterval.new($2, $3)
       when /\A(#{TimeUnit::UNIT_REGEXP})\b/io
         value = TimeInterval.new(1, $1)
-      when /\A((ago))\b/i
+        type = :unit
+      when /\A(ago)\b/i
         value = $1.downcase.to_sym
         value = @@direction_alias[value]
         type = :relative
-      when /\A((before|after|from|since))\b/i
+      when /\A(before|after|from|since)\b/i
         value = $1.downcase.to_sym
         value = @@direction_alias[value]
         type = :relation
@@ -877,6 +878,8 @@ module Qreport
         "yesterday 9:15am" => ":day 2011-03-09T00:00:00.000000-06:00", # FIXME
         "10 days ago" => ":day 2011-02-28T00:00:00.000000-06:00",
         "10 s ago" => ":sec 2011-03-10T15:10:27.000000-06:00",
+        "day before yesterday" => ":day 2011-03-08T00:00:00.000000-06:00",
+        "hr before tomorrow" => ":hour 2011-03-10T23:00:00.000000-06:00",
         "3 days before today" => ":day 2011-03-07T00:00:00.000000-06:00",
         "5 days after today" => ":day 2011-03-15T00:00:00.000000-05:00",
         "5 days before now" => "nil 2011-03-05T15:10:37.981304-06:00",
