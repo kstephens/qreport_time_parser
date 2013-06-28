@@ -580,6 +580,15 @@ module Qreport
           raise TypeError, x.inspect
         end
       end
+
+      def to_s
+        "#{@amount.inspect} #{@unit.inspect}"
+      end
+
+      def inspect
+        "#<#{self.class} #{to_s}>"
+      end
+
     end
 
     class TimeRelative
