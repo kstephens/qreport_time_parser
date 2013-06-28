@@ -417,7 +417,9 @@ module Qreport
 
       def normalize!
         case @unit
-        when nil, Symbol
+        when nil
+        when Symbol
+          @unit = @@unit_alias[@unit] || @unit
         when String
           @unit = @unit.downcase.to_sym
           @unit = @@unit_alias[@unit] || @unit
