@@ -252,6 +252,8 @@ module Qreport
         return EOS
       when /\A(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(-[\d:]+)?)\b/ # iso8601
         value = TimeWithUnit.new(Time.parse($1), nil)
+      when /\A(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?(\s+[-+]?[\d]+)?)\b/ # Time#to_s
+        value = TimeWithUnit.new(Time.parse($1), nil)
       when /\A(year\s+(\d+))/i
         year = $2 && $2.to_i
         value = TimeRelative.new
@@ -838,6 +840,8 @@ module Qreport
       now = ::Time.parse("2011-03-10T15:10:37.981304-06:00")
       examples = {
         "now" => "nil 2011-03-10T15:10:37.981304-06:00",
+        now.to_s => "nil 2011-03-10T15:10:37.000000-06:00",
+        "2011-03-10 15:10:37.981304 -0600" => "nil 2011-03-10T15:10:37.981304-06:00",
         "today" => ":day 2011-03-10T00:00:00.000000-06:00",
         "tomorrow" => ":day 2011-03-11T00:00:00.000000-06:00",
         "yesterday" => ":day 2011-03-09T00:00:00.000000-06:00",
