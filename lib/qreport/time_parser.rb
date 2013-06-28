@@ -325,8 +325,8 @@ module Qreport
         value = TimeWithUnit.new(now, $3)
       when /\A((previous|last|next)\s+(#{TimeUnit::UNIT_REGEXP}))\b/io
         value = TimeWithUnit.new(now, $3) + TimeInterval.new($2, $3)
-      when /\A((#{TimeUnit::UNIT_REGEXP})s?)\b/io
-        value = TimeInterval.new(1, $2)
+      when /\A(#{TimeUnit::UNIT_REGEXP})\b/io
+        value = TimeInterval.new(1, $1)
       when /\A((ago))\b/i
         value = $1.downcase.to_sym
         value = @@direction_alias[value]
@@ -463,10 +463,29 @@ module Qreport
         :millenium => (60 * 60 * 24) * 365000,
       }
 
+      def self.pluralize str
+        str = str.to_s
+        case str
+        when "day"
+          "days"
+        when /y\Z/
+          str.sub(/y\Z/, 'ies')
+        else
+          str + "s"
+        end
+      end
+
+      (@@unit_alias.to_a.flatten + @@unit_interval.keys).each do | x |
+        next unless x
+        next if x.size == 1
+        x = x.to_sym
+        @@unit_alias[pluralize(x).to_sym] ||= @@unit_alias[x] || x
+      end
+
       def unit_multiplier unit = @unit
         @@unit_interval[unit] || 1
       end
- 
+
       UNIT_REGEXP = 
         (@@unit_interval.keys + 
          @@unit_alias.keys + 
@@ -864,6 +883,7 @@ module Qreport
         "3 days before this minute" => ":min 2011-03-07T15:10:00.000000-06:00",
         "5 days before yesterday" => ":day 2011-03-04T00:00:00.000000-06:00",
         "2 days before 50 hours after tomorrow" => ":hour 2011-03-11T02:00:00.000000-06:00",
+        "2 centuries after today" => ":day 2211-01-21T00:00:00.000000-06:00",
         "1pm" => ":hour 2011-03-10T13:00:00.000000-06:00",
         "12:30pm" => ":min 2011-03-10T12:30:00.000000-06:00",
         "9:20am tomorrow" => ":min 2011-03-11T09:20:00.000000-06:00",
