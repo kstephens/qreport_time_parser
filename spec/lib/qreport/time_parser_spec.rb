@@ -8,6 +8,7 @@ describe Qreport::TimeParser do
     examples.each do | expr, val |
       next if Symbol === expr
       it "should translate #{expr.inspect} to #{val.inspect}" do
+        val, time_range = val if Array === val
         t = nil
         begin
           tp = Qreport::TimeParser.new
@@ -18,6 +19,7 @@ describe Qreport::TimeParser do
           t = exc
         end
         t.to_s.should == val
+        t.to_TimeRange.to_s.should == time_range.to_s if time_range
       end
     end
   end

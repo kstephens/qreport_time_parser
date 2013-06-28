@@ -765,8 +765,12 @@ module Qreport
         "#{@unit.inspect} #{@time && @time.iso8601(6)}"
       end
 
+      def to_TimeRange
+        TimeRange.new(self, self + unit_interval)
+      end
+
       def to_range
-        (self ... (self + unit_interval))
+        to_TimeRange.to_range
       end
     end
 
@@ -843,6 +847,8 @@ module Qreport
         "between 12:45pm and 1:15pm" => ":min 2011-03-10T12:45:00.000000-06:00 ... :min 2011-03-10T13:15:00.000000-06:00",
         "before 1:23pm tomorrow" => ":min 2011-03-11T13:22:00.000000-06:00",
         "this minute" => ":min 2011-03-10T15:10:00.000000-06:00",
+        "last hour" => ":hour 2011-03-10T14:00:00.000000-06:00",
+        "last day" => [ ":day 2011-03-09T00:00:00.000000-06:00", ":day 2011-03-09T00:00:00.000000-06:00 ... :day 2011-03-10T00:00:00.000000-06:00" ],
       }
       examples[:now] = now
       examples
