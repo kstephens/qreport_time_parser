@@ -42,7 +42,7 @@ describe Qreport::TimeParser do
       (a - d).inspect.should == "#<Qreport::TimeParser::TimeInterval -442677 :sec>"
     end
 
-    it "should handle *" do
+    it "should handle * Numeric" do
       (a * 2).inspect.should == "#<Qreport::TimeParser::TimeInterval 246 nil>"
       (b * 2).inspect.should == "#<Qreport::TimeParser::TimeInterval 246 :sec>"
       (c * 2).inspect.should == "#<Qreport::TimeParser::TimeInterval 246 :min>"
