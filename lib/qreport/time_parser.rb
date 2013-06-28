@@ -181,7 +181,7 @@ module Qreport
 
     ensure
       if restore && ! @taken_tokens.empty?
-        $stderr.puts "  #{sel.inspect} restoring tokens #{@taken_tokens.inspect}"
+        $stderr.puts "  #{sel.inspect} restoring tokens #{@taken_tokens.inspect}" if @debug
         @taken_tokens.reverse.each do | t |
           push_token! t
         end 
