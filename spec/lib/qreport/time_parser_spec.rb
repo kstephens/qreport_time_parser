@@ -73,6 +73,14 @@ describe Qreport::TimeParser do
     end
   end
 
+  context "intervals" do
+    it "should parse intervals." do
+      Qreport::TimeParser.new.parse("10 seconds", :p_interval).inspect.should == "#<Qreport::TimeParser::TimeInterval 10 :sec>"
+      Qreport::TimeParser.new.parse("10 centuries", :p_interval).inspect.should == "#<Qreport::TimeParser::TimeInterval 10 :century>"
+      Qreport::TimeParser.new.parse("2013-01-23T12:34:56.901234Z", :p_interval).inspect.should == "nil"
+    end
+  end
+
   describe 'examples' do
     examples = Qreport::TimeParser.examples
     now = examples[:now]

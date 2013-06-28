@@ -20,11 +20,11 @@ module Qreport
       @taken_tokens = [ ]
     end
 
-    def parse str
+    def parse str, start = nil
       @input_orig = str.dup
       @input = str.dup
       @pos = 0
-      @result = p_start
+      @result = start ? send(start) : p_start
       @result = @result.value if @result.respond_to?(:value)
       @result
     end
