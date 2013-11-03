@@ -23,12 +23,13 @@ describe Qreport::ReportRunner::TimeParse do
       subject.time_parse("now").should == (::Time.parse("2011-04-27T08:23:37.981304") ... ::Time.parse("2011-04-27T08:23:38.981304")) # questionable?
     end
     it "should parse 'now' with unit_for_now[:now] = :now." do
-      pending
+      pending "incorrect default unit creates 1-sec range"
       p.unit_for_now[:now] = :now
       subject.time_parse("now").should == ::Time.parse("2011-04-27T08:23:37.981304")
     end
     it "should parse 't' with unit_for_now[:t] = :now." do
-      pending
+      pending "incorrect default unit creates 1-sec range"
+      p.debug = 1
       subject.time_parse("t - 10 sec").should == ::Time.parse("2011-04-27T08:23:37.981304")
     end
     it "should parse relative date." do
