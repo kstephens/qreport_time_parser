@@ -12,7 +12,7 @@ describe Qreport::ReportRunner::TimeParse do
     it "should leave nil alone." do
       subject.time_parse(nil).should == nil
     end
-    it "should leave nil alone." do
+    it "should leave Time alone." do
       now = Time.now
       subject.time_parse(now).should == now
     end
