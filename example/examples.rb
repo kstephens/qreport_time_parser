@@ -1,27 +1,3 @@
-# QreportTimeParser
-
-A Time/Date parser with implicit precision.
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'qreport_time_parser'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install qreport_time_parser
-
-## Usage
-
-Qreport::TimeParser will parse human-specified Time values into Time ranges with implicit precision.
-
-## Examples
-
     require 'qreport/time_parser'
     
     p = Qreport::TimeParser.new
@@ -146,11 +122,3 @@ Qreport::TimeParser will parse human-specified Time values into Time ranges with
       # => ":year 2010-01-01T00:00:00.000000-06:00 ... :year 2011-01-01T00:00:00.000000-06:00"
     
     p.parse("between 12:45pm and 1:15pm").to_TimeRange
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
