@@ -85,6 +85,8 @@ module Qreport
         self
       end
 
+      def to_int; to_sec; end # see ruby/time.c
+
       def to_sec
         @to_sec ||=
           @amount * unit_multiplier
