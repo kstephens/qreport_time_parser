@@ -1,5 +1,6 @@
 require 'qreport/time_parser'
 require 'qreport/time_parser/time_unit'
+require 'rational'
 
 module Qreport
   class TimeParser
