@@ -28,6 +28,8 @@ module Qreport
         "#{a} ... #{b}"
       end
 
+      def to_TimeRange; self; end
+
       def to_range
         if a <= b
           (a.to_time ... b.to_time)
