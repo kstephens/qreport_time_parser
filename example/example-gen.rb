@@ -28,13 +28,13 @@ examples.each do | expr, val |
     $stderr.puts "ERROR: #{exc.inspect}"
     err = exc
   end
-  fh.p "p.parse(#{expr.inspect}).to_TimeRange"
+  fh.p "puts p.parse(#{expr.inspect}).to_TimeRange"
   if t
-    fh.p "  # => #{t.to_TimeRange.to_s.inspect}"
+    fh.p "  # => #{t.to_TimeRange}"
     fh.p ""
   end
   if err
-    fh.p "  # => #{err.inspect}\n\n"
+    fh.p "  # => #{err.inspect}"
     fh.p ""
   end
 end
