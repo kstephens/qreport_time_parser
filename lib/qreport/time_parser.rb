@@ -14,7 +14,8 @@ module Qreport
     def initialize start = nil
       @start = start
       @unit_for_now = { :today => :day, :t => :now }
-      @debug = false # true
+      @debug = false
+      # @debug = true
       initialize_copy nil
     end
 
@@ -27,40 +28,57 @@ module Qreport
 
     def parse str, start = nil
       start ||= @start
+      $stderr.puts "\n  parse #{str.inspect} #{start.inspect}" if @debug
       @input_orig = str.dup
       @input = str.dup
       @pos = 0
-      @result = start ? send(start) : p_start
+      @p_depth = 1
+      @result = send(start || :p_start)
       @result = @result.value if @result.respond_to?(:value)
+      $stderr.puts "  parse #{str.inspect} #{start.inspect} => #{@result.inspect}\n\n" if @debug
       @result
     end
 
-    def _p_start
+    def self.def_p name, &blk
+      sel = :"p_#{name}"
+      _sel = :"_#{sel}"
+      define_method _sel, &blk
+      define_method sel do
+        _wrap_p! sel do
+          restore_tokens_on_failure!(sel) do
+            send(_sel)
+          end
+        end
+      end
+      sel
+    end
+
+    def_p :start do
       # debugger
       p_range or
       p_time_expr or
       raise Error
     end
 
-    def _p_range
+    def_p :range do
       if p_between and a = p_time_expr and p_and and b = p_time_expr
         TimeRange.new(a, b)
       end
     end
 
-    def _p_between
+    def_p :between do
       token.type == :range and
         token.value == :between and
         take_token.value
     end
 
-    def _p_and
+    def_p :and do
       token.type == :logical and
         token.value == :and and
         take_token.value
     end
 
-    def _p_time_expr
+    def_p :time_expr do
       case
       when v = p_numeric_relative
         v
@@ -90,7 +108,7 @@ module Qreport
 
     # 10 sec before now
     # 10 sec ago
-    def _p_numeric_relative
+    def_p :numeric_relative do
       if (interval = p_interval)
         case
         when (direction = p_relation and time = p_time_expr)
@@ -102,7 +120,7 @@ module Qreport
     end
 
     # 10 secs|day
-    def _p_interval
+    def_p :interval do
       case token.value
       when Numeric 
         amount = take_token.value
@@ -117,25 +135,25 @@ module Qreport
     end
 
     # before|after|since
-    def _p_relation
+    def_p :relation do
       token.type == :relation and take_token.value
     end
 
     # ago
-    def _p_relative
+    def_p :relative do
       token.type == :relative and take_token.value
     end
 
     # + interval
-    def _p_operation
+    def_p :operation do
       token.type == :operation and take_token.value
     end
 
-    def _p_time
+    def_p :time do
       TimeWithUnit === token.value and take_token.value
     end
 
-    def _p_time_or_date_relative
+    def_p :time_or_date_relative do
       case
       when tr = _p_time_relative
         dr = _p_date_relative
@@ -161,59 +179,51 @@ module Qreport
     end
 
     # 12pm|12:30a|12:34:56pm
-    def _p_time_relative
+    def_p :time_relative do
       token.type == :time_relative and
         TimeRelative === token.value and
         take_token.value
     end
 
     # 2001/01|2001-02-20
-    def _p_date_relative
+    def_p :date_relative do
       token.type == :date_relative and
         TimeRelative === token.value and
         take_token.value
+    end
+
+    def _wrap_p! sel, &blk
+      if @debug
+        $stderr.puts "  #{' ' * @p_depth} #{sel} ... | #{token.inspect} #{token.value.inspect}"
+        @p_depth += 1
+        begin
+          restore_tokens_on_failure!(sel, &blk)
+        ensure
+          @p_depth -= 1
+          $stderr.puts "  #{' ' * @p_depth} #{sel} => #{result.inspect} | #{token.inspect}"
+        end
+      else
+        restore_tokens_on_failure!(sel, &blk)
+      end
     end
 
     def restore_tokens_on_failure!(sel)
       restore = true
       (@taken_tokens_stack ||= [ ]) << @taken_tokens
       @taken_tokens = [ ]
-
-      result = yield
-
-      # $stderr.puts "  #{sel.inspect} taken_tokens = #{@taken_tokens.inspect}"
-      restore = false if result
-
-      result
-
-    ensure
-      if restore && ! @taken_tokens.empty?
-        $stderr.puts "  #{sel.inspect} restoring tokens #{@taken_tokens.inspect}" if @debug
-        @taken_tokens.reverse.each do | t |
-          push_token! t
-        end 
-      end
-      @taken_tokens = @taken_tokens_stack.pop
-    end
-
-    def method_missing sel, *args, &blk
-      if ! block_given? && args.empty? && sel.to_s =~ /^p_/
-        result = nil
-        if @debug
-          @p_depth ||= 0 
-          $stderr.puts "  #{' ' * @p_depth} #{sel} ... | #{token.inspect} #{token.value.inspect}"
-          @p_depth += 1
-        end
-        restore_tokens_on_failure!(sel) do
-          result = send(:"_#{sel}", *args, &blk)
-        end
-        if @debug
-          @p_depth -= 1
-          $stderr.puts "  #{' ' * @p_depth} #{sel} => #{result.inspect} | #{token.inspect}"
-        end
+      begin
+        result = yield
+        # $stderr.puts "  #{sel.inspect} taken_tokens = #{@taken_tokens.inspect}"
+        restore = false if result
         result
-      else
-        super
+      ensure
+        if restore && ! @taken_tokens.empty?
+          $stderr.puts "  #{sel.inspect} restoring tokens #{@taken_tokens.inspect}" if @debug
+          @taken_tokens.reverse.each do | t |
+            push_token! t
+          end
+        end
+        @taken_tokens = @taken_tokens_stack.pop
       end
     end
 
