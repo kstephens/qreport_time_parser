@@ -3,6 +3,7 @@ require 'qreport/time_parser'
 module Qreport
   class TimeParser
     module TimeUnit
+      include Comparable
       attr_reader :unit
 
       def new *args
@@ -85,15 +86,25 @@ module Qreport
          @@unit_alias.keys + 
          @@unit_alias.values).
         uniq.
-        map{|x| x.to_s}.
-        reject{|x| x.empty?}.
-        sort{|a, b| b.size <=> a.size} * '|'
+        map(&:to_s).
+        reject(&:empty?).
+        sort_by(&:size) * '|'
       # $stderr.puts "UNIT_REGEXP = #{UNIT_REGEXP}"
 
       def unit_interval
         @unit_interval ||=
           TimeInterval.new(1, @unit)
       end
+
+      def <=> x
+        case x
+        when TimeInterval
+          unit_interval <=> x.unit_interval
+        else
+          unit_interval <=> x
+        end
+      end
+
     end
   end
 end

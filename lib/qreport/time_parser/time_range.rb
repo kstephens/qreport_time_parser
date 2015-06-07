@@ -24,6 +24,10 @@ module Qreport
         a <= b ? b : a
       end
 
+      def <=> x
+        min <=> x.min
+      end
+
       def to_s
         "#{a} ... #{b}"
       end
