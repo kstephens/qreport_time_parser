@@ -2,13 +2,18 @@ require 'spec_helper'
 require 'qreport/report_runner/time_parse'
 
 describe Qreport::ReportRunner::TimeParse do
-  attr :p
-  before(:all) do
-    @p = Qreport::TimeParser.new
-    p.now = ::Time.parse("2011-04-27T08:23:37.981304")
-    Qreport::ReportRunner.time_parser = p
-  end
   context "time_parse" do
+    subject do
+      Qreport::ReportRunner.time_parser = p
+      Qreport::ReportRunner::TimeParse
+    end
+    let(:p) do
+      p = Qreport::TimeParser.new
+      p.now = now
+      p
+    end
+    let(:now) { ::Time.parse("2011-04-27T08:23:37.981304") }
+
     it "should leave nil alone." do
       subject.time_parse(nil).should == nil
     end
@@ -20,17 +25,16 @@ describe Qreport::ReportRunner::TimeParse do
       subject.time_parse(:now).should == Qreport::ReportRunner.time_parser.now
     end
     it "should parse 'now'." do
-      subject.time_parse("now").should == (::Time.parse("2011-04-27T08:23:37.981304") ... ::Time.parse("2011-04-27T08:23:38.981304")) # questionable?
+      subject.time_parse("now").should == (now ... now + 1)
     end
     it "should parse 'now' with unit_for_now[:now] = :now." do
-      pending "incorrect default unit creates 1-sec range"
+      pending "interval should be 0 width"
       p.unit_for_now[:now] = :now
-      subject.time_parse("now").should == ::Time.parse("2011-04-27T08:23:37.981304")
+      subject.time_parse("now").should == (now ... now)
     end
     it "should parse 't' with unit_for_now[:t] = :now." do
-      pending "incorrect default unit creates 1-sec range"
-      p.debug = 1
-      subject.time_parse("t - 10 sec").should == ::Time.parse("2011-04-27T08:23:37.981304")
+      pending "interval should be 0 width"
+      subject.time_parse("t - 10 sec").should == ((now - 10) ... (now - 10))
     end
     it "should parse relative date." do
       subject.time_parse("yesterday").should == (::Time.parse("2011-04-26T00:00:00") ... ::Time.parse("2011-04-27T00:00:00"))

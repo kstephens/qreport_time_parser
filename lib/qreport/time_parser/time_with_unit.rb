@@ -19,7 +19,7 @@ module Qreport
 
       def + amount
         # debugger
-        amount = interval(amount) if Numeric === amount
+        amount = interval(amount) unless TimeInterval === amount
         raise TypeError, amount.to_s unless TimeInterval === amount
         new(@time + amount.to_sec, 
             [ unit_interval, amount.unit_interval ] )
