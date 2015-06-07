@@ -24,5 +24,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.7.1'
   spec.add_development_dependency "guard", "~> 1.8.0"
   spec.add_development_dependency "guard-rspec", "~> 3.0.2"
-  spec.add_development_dependency "cassava", "~> 0.0.1"
 end
