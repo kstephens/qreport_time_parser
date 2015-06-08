@@ -172,15 +172,13 @@ module Qreport
       tr ||= dr
       tr = tr.dup
       if tr && dr && tr != dr
-         tr.merge!(dr)
+        tr.merge!(dr)
       end
 
       unit = tr.unit
       t = p_time_expr || now
-      # debugger
       tr.merge!(t)
       t = TimeWithUnit.new(tr.to_time, unit)
-      # $stderr.puts "  tr = #{tr.inspect} dr = #{dr.inspect} => t = #{t.inspect}"
       t
     end
 
@@ -258,7 +256,6 @@ module Qreport
     end
 
     def lex
-      debug = @debug
       type = value = nil
       @input.sub!(/\A(\s+)/, '')
       pre_whitespace = $1
@@ -278,7 +275,6 @@ module Qreport
         type = :date_relative
       when /\A((\d{4})(?:([-\/])(0?[1-9]|1[0-2])(?:\3([0-2][0-9]|3[01]))?))\b/i
                year = $2 && $2.to_i
-                         sep = $3
                                mon = $4 && $4.to_i
                                                      day = $5 && $5.to_i
         value = TimeRelative.new
@@ -293,7 +289,6 @@ module Qreport
         value.mon = mon
         value.day = day
         type = :date_relative
-        # debug = true
       when /\A((0?[1-9]|1[0-2])(?::([0-5][0-9])(?::([0-5][0-9]|60))?)\s*(am?|pm?)?)\b/i
         hour = $2.to_i
         min = $3 && $3.to_i
@@ -308,7 +303,6 @@ module Qreport
         type = :time_relative
       when /\A(\d\d?)([\/-])(\d\d\d\d)\b/i
         mon = $1 && $1.to_i
-        sep = $2
         year = $3 && $3.to_i
         value = TimeRelative.new
         value.year = year
