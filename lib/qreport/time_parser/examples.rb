@@ -29,9 +29,8 @@ module Qreport
         "9:20am tomorrow" => ":min 2011-03-11T09:20:00.000000-06:00",
         "6am 3 days from yesterday" => ":hour 2011-03-12T06:00:00.000000-06:00",
         "2001/01" => ":mon 2001-01-01T00:00:00.000000-06:00",
-        "2001-01" => ":mon 2001-01-01T00:00:00.000000-06:00",
-        # "01/2001" => ":mon 2001-01-01T00:00:00.000000-06:00",
-        "01/2001" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 2: \"01 |^| /2001\">",
+        "2001-02" => ":mon 2001-02-01T00:00:00.000000-06:00",
+        "03/2001" => ":mon 2001-03-01T00:00:00.000000-06:00",
         "2001/02/03 12:23pm" => ":min 2001-02-03T12:23:00.000000-06:00",
         "12/31 12:59pm" => ":min 2011-12-31T12:59:00.000000-06:00",
         "12/31 last year" => ":day 2010-12-31T00:00:00.000000-06:00",
@@ -53,8 +52,10 @@ module Qreport
         "last day"   => [ ":day 2011-03-09T00:00:00.000000-06:00", ":day 2011-03-09T00:00:00.000000-06:00 ... :day 2011-03-10T00:00:00.000000-06:00" ],
         "previous day" => ":day 2011-03-09T00:00:00.000000-06:00",
         "  2001-01 + 1234 ajsdkfsd hours" => "#<Qreport::TimeParser::Error::Syntax: syntax error at position 17: \"  2001-01 + 1234  |^| ajsdkfsd hours\">",
-        "15 sec" => "#<Qreport::TimeParser::Error: Qreport::TimeParser::Error>",
-        "12 minutes" => "#<Qreport::TimeParser::Error: Qreport::TimeParser::Error>",
+        "15 sec" => "#<Qreport::TimeParser::Error::Syntax: not range or time at position 6: \"15 sec |^| \">",
+        "12 minutes" => "#<Qreport::TimeParser::Error::Syntax: not range or time at position 10: \"12 minutes |^| \">",
+        "15 sec from now"     => ":sec 2011-03-10T15:10:52.000000-06:00", # FIXME
+        "12 minutes from now" => "nil 2011-03-10T15:22:37.981304-06:00",
       }
       examples[:now] = now
       examples

@@ -4,9 +4,8 @@ require 'rational'
 module Qreport
   class TimeParser
     class Error < ::Exception
-      class Syntax < self
-        attr_accessor :position, :description
-      end
+      attr_accessor :position, :description
+      class Syntax < self ; end
     end
 
     attr_accessor :input, :start, :result, :now, :debug, :unit_for_now
@@ -24,16 +23,20 @@ module Qreport
       @token = nil
       @token_stack = [ ]
       @taken_tokens = [ ]
+      @pos = @result = nil
     end
 
     def parse str, start = nil
-      start ||= @start
+      _parse str, start || @start
+    end
+
+    def _parse str, start
       $stderr.puts "\n  parse #{str.inspect} #{start.inspect}" if @debug
       @input_orig = str.dup
       @input = str.dup
       @pos = 0
       @p_depth = 1
-      @result = send(start || :p_start)
+      @result = send(start || :p_default)
       @result = @result.value if @result.respond_to?(:value)
       $stderr.puts "  parse #{str.inspect} #{start.inspect} => #{@result.inspect}\n\n" if @debug
       @result
@@ -53,11 +56,14 @@ module Qreport
       sel
     end
 
-    def_p :start do
-      # debugger
+    def_p :default do
+      p_range_or_time
+    end
+
+    def_p :range_or_time do
       p_range or
       p_time_expr or
-      raise Error
+      raise make_error Error::Syntax, "not range or time"
     end
 
     def_p :range do
@@ -99,7 +105,7 @@ module Qreport
         when :-
           v -= interval
         else
-          raise Error, op
+          raise make_error Error, "unexpected time interval operation #{op.inspect}"
         end
       end
 
@@ -359,13 +365,9 @@ module Qreport
         value = $1.downcase.to_sym
         type = :logical
       else
-        desc = describe_current_parse_position
-        err = Error::Syntax.new("syntax error at position #{@pos}: #{desc.inspect}")
-        err.position = @pos
-        err.description = desc
-        raise err
+        raise make_error Error::Syntax, "syntax error"
       end
-      token = $1
+      token = $&
       pos = @pos
       @input[0, token.size] = ''
       @pos += token.size
@@ -376,6 +378,14 @@ module Qreport
       token.type = type
       $stderr.puts "  token => #{token.inspect}" if debug
       token
+    end
+
+    def make_error cls, msg
+      desc = describe_current_parse_position
+      err = cls.new("#{msg} at position #{@pos}: #{desc.inspect}")
+      err.position = @pos
+      err.description = desc
+      err
     end
 
     def describe_current_parse_position

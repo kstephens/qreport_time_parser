@@ -24,7 +24,7 @@ describe Qreport::TimeParser do
         begin
           tp = Qreport::TimeParser.new
           tp.now = now
-          # tp.debug = true if expr =~ /between/i
+          # tp.debug = true if val.to_s =~ /::Error/
           t = tp.parse(expr)
         rescue Qreport::TimeParser::Error => exc
           t = exc.inspect
